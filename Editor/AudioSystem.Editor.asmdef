@@ -1,0 +1,16 @@
+{
+    "name": "AudioSystem.Editor",
+    "rootNamespace": "AudioSystem.Editor",
+    "references": ["GUID:61f0f5459b81dec4496b49ae370ee643"],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

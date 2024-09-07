@@ -1,0 +1,5 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <uie:PropertyField name="entries-property" />
+    <ui:Button text="Update" parse-escape-sequences="true" display-tooltip-when-elided="true" name="update-btn" />
+    <ui:TextField picking-mode="Ignore" label="Last Update" readonly="true" name="update-txt" binding-path="lastUpdate" />
+</ui:UXML>
