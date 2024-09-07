@@ -1,0 +1,6 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:TextField picking-mode="Ignore" label="Name Tag" name="name-tag-txt" binding-path="nameTag" />
+    <ui:Button text="Set Tag To File Name" parse-escape-sequences="true" display-tooltip-when-elided="true" name="tag-to-file-btn" />
+    <ui:Button text="Set File Name To Tag" parse-escape-sequences="true" display-tooltip-when-elided="true" name="file-to-tag-btn" />
+    <uie:PropertyField name="sound-property" />
+</ui:UXML>

@@ -1,0 +1,10 @@
+<ui:UXML xmlns:ui="UnityEngine.UIElements" xmlns:uie="UnityEditor.UIElements" xsi="http://www.w3.org/2001/XMLSchema-instance" engine="UnityEngine.UIElements" editor="UnityEditor.UIElements" noNamespaceSchemaLocation="../../../../../UIElementsSchema/UIElements.xsd" editor-extension-mode="True">
+    <ui:TextField picking-mode="Ignore" label="Path" binding-path="savePath" name="save-path-txt" />
+    <ui:Button text="Browse" parse-escape-sequences="true" display-tooltip-when-elided="true" name="browse-save-path-btn" />
+    <uie:PropertyField binding-path="audioClips" name="audioclips-prop" />
+    <ui:TextField picking-mode="Ignore" label="Name Prefix" binding-path="namePrefix" name="prefix-txt" />
+    <ui:TextField picking-mode="Ignore" label="Name Suffix" binding-path="nameSuffix" name="suffix-txt" />
+    <ui:DropdownField label="Entry Type" choices="Select, Sound, Music" name="entry-type-dropdown" view-data-key="entryType" index="0" />
+    <uie:PropertyField name="sound-data-prop" binding-path="defaultSoundData" />
+    <ui:Button text="Create Entries" parse-escape-sequences="true" display-tooltip-when-elided="true" name="create-entries-btn" />
+</ui:UXML>
