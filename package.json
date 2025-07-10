@@ -1,6 +1,6 @@
 {
   "name": "com.gitamend.audiosystem",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "displayName": "Audio Pooling System",
   "description": "Custom version of the Audio System made by GitAmend. Changed for personal use.",
   "unity": "2022.3",

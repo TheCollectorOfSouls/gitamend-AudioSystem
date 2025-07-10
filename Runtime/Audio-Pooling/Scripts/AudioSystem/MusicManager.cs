@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using AudioSystem.Utils;
 using UnityEngine;
@@ -6,10 +7,12 @@ using UnityEngine.Audio;
 namespace AudioSystem {
     public class MusicManager : PersistentSingleton<MusicManager> {
         const float crossFadeTime = 1.0f;
-        float fading;
-        AudioSource current;
-        AudioSource previous;
-        readonly Queue<AudioClip> playlist = new();
+        float _fading;
+        AudioSource _current;
+        AudioSource _previous;
+        readonly Queue<AudioClip> _playlist = new();
+        private AudioClip[] _loopPlayList;
+        private bool _crossFadeEnabled = true;
         
         [SerializeField] MusicLibrary musicLibrary;
         [SerializeField] List<AudioClip> initialPlaylist;
@@ -33,6 +36,14 @@ namespace AudioSystem {
             }
         }
         
+        public void EnableCrossFade(bool value) => _crossFadeEnabled = value;
+        
+        public void CreateLoopingPlaylist(AudioClip[] audioClips)
+        {
+            _loopPlayList = new AudioClip[audioClips.Length];
+            Array.Copy(sourceArray: audioClips, destinationArray: _loopPlayList, audioClips.Length);
+        }
+        
         public void AddToPlaylist(string nameTag) {
             if(!CurrentMusicLibrary) return;
 
@@ -43,16 +54,16 @@ namespace AudioSystem {
         }
 
         public void AddToPlaylist(AudioClip clip) {
-            playlist.Enqueue(clip);
-            if (current == null && previous == null) {
+            _playlist.Enqueue(clip);
+            if (_current == null && _previous == null) {
                 PlayNextTrack();
             }
         }
 
-        public void Clear() => playlist.Clear();
+        public void Clear() => _playlist.Clear();
 
         public void PlayNextTrack() {
-            if (playlist.TryDequeue(out AudioClip nextTrack)) {
+            if (_playlist.TryDequeue(out AudioClip nextTrack)) {
                 Play(nextTrack);
             }
         }
@@ -63,54 +74,79 @@ namespace AudioSystem {
             Play(musicLibrary.GetMusicClip(nameTag), loop);
         }
 
-        public void Play(AudioClip clip, bool loop = false) {
-            if (current && current.clip == clip) return;
+        public void Play(AudioClip clip, bool loop = false, bool crossFade = false) {
+            if (_current && _current.clip == clip && _current.isPlaying) return;
 
-            if (previous) {
-                Destroy(previous);
-                previous = null;
+            if (_previous) {
+                Destroy(_previous);
+                _previous = null;
             }
-            previous = current;
+            _previous = _current;
 
-            current = gameObject.AddComponent<AudioSource>();
-            current.clip = clip;
-            current.outputAudioMixerGroup = musicMixerGroup; // Set mixer group
-            current.loop = loop; // For playlist functionality, we want tracks to play once
-            current.volume = 0;
-            current.bypassListenerEffects = true;
-            current.Play();
+            _current = gameObject.AddComponent<AudioSource>();
+            _current.clip = clip;
+            _current.outputAudioMixerGroup = musicMixerGroup; // Set mixer group
+            _current.loop = loop; // For playlist functionality, we want tracks to play once
+            _current.volume = _crossFadeEnabled || crossFade? 0 : 1;
+            _current.bypassListenerEffects = true;
+            _current.Play();
 
-            fading = 0.001f;
+            if(_crossFadeEnabled || crossFade)
+            {
+                _fading = 0.001f;
+            }
+            else
+            {
+                _fading = 0.0f;
+                DestroyPrevious();
+            }
         }
 
         void Update() {
             HandleCrossFade();
 
-            if (current && !current.isPlaying && playlist.Count > 0) {
-                PlayNextTrack();
+            if (_current && !_current.isPlaying) 
+            {
+                if(_playlist.Count > 0) 
+                {
+                    PlayNextTrack();
+                }
+
+                else if(_playlist.Count <= 0 && _loopPlayList.Length > 0) 
+                {
+                    foreach (var audioClip in _loopPlayList)
+                    {
+                        AddToPlaylist(audioClip);
+                    }
+                    PlayNextTrack();
+                }
             }
         }
 
         void HandleCrossFade() {
-            if (fading <= 0f) return;
+            if (_fading <= 0f) return;
             
-            fading += Time.deltaTime;
+            _fading += Time.deltaTime;
 
-            float fraction = Mathf.Clamp01(fading / crossFadeTime);
+            float fraction = Mathf.Clamp01(_fading / crossFadeTime);
 
             // Logarithmic fade
             float logFraction = fraction.ToLogarithmicFraction();
 
-            if (previous) previous.volume = 1.0f - logFraction;
-            if (current) current.volume = logFraction;
+            if (_previous) _previous.volume = 1.0f - logFraction;
+            if (_current) _current.volume = logFraction;
 
             if (fraction >= 1) {
-                fading = 0.0f;
-                if (previous) {
-                    Destroy(previous);
-                    previous = null;
-                }
+                _fading = 0.0f;
+                DestroyPrevious();
             }
+        }
+        
+        void DestroyPrevious()
+        {
+            if (!_previous) return;
+            Destroy(_previous);
+            _previous = null;
         }
     }
 }

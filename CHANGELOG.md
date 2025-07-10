@@ -1,3 +1,14 @@
+## [1.1.0] - 2025-07-10
+## Adjustments
+- Support for looping playlist in MusicManager
+- Option to disable crossfade in MusicManager
+- Added a cache emitter variable to the sound builder for more control over the last emitter started by the builder.
+- Easier to control looping sounds. (use a specific builder for each loop sound and control using the cache emitter)
+- Added option to create an emitter with a specific parent.
+- Emitters now play the stop sound function if they are disabled.
+- Added action event on Emitter stop.
+- Option to not use don't destroy on managers.
+
 ## [1.0.0] - 2024-09-06
 ## First Release
 - Music Library and Sound Library scriptable created to hold reference of all sounds that can be played in the game.

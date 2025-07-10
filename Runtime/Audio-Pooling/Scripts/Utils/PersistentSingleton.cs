@@ -1,8 +1,11 @@
+using UnityEngine.Serialization;
+
 namespace AudioSystem.Utils {
     using UnityEngine;
 
     public class PersistentSingleton<T> : MonoBehaviour where T : Component {
-        public bool AutoUnparentOnAwake = true;
+        public bool autoUnparentOnAwake = true;
+        public bool persistOnLoad = true;
 
         protected static T instance;
 
@@ -33,13 +36,14 @@ namespace AudioSystem.Utils {
         protected virtual void InitializeSingleton() {
             if (!Application.isPlaying) return;
 
-            if (AutoUnparentOnAwake) {
+            if (autoUnparentOnAwake) {
                 transform.SetParent(null);
             }
 
             if (instance == null) {
                 instance = this as T;
-                DontDestroyOnLoad(gameObject);
+                if(persistOnLoad)
+                    DontDestroyOnLoad(gameObject);
             }
             else {
                 if (instance != this) {

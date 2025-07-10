@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using AudioSystem.Utils;
@@ -9,70 +10,91 @@ namespace AudioSystem {
     public class SoundEmitter : MonoBehaviour {
         public SoundData Data { get; private set; }
         public LinkedListNode<SoundEmitter> Node { get; set; }
+        public bool IsActive { get; private set; }
 
-        AudioSource audioSource;
-        Coroutine playingCoroutine;
+        AudioSource _audioSource;
+        Coroutine _playingCoroutine;
+        private WaitWhile _waitWhilePlaying;
+        
+        public event Action OnStopped;
 
         void Awake() {
-            audioSource = gameObject.GetOrAdd<AudioSource>();
+            _audioSource = gameObject.GetOrAdd<AudioSource>();
+        }
+        
+        private void OnDisable()
+        {
+            if(IsActive)
+                Stop();
         }
 
         public void Initialize(SoundData data) {
             Data = data;
-            audioSource.clip = data.clip;
-            audioSource.outputAudioMixerGroup = data.mixerGroup;
-            audioSource.loop = data.loop;
-            audioSource.playOnAwake = data.playOnAwake;
+            _audioSource.clip = data.clip;
+            _audioSource.outputAudioMixerGroup = data.mixerGroup;
+            _audioSource.loop = data.loop;
+            _audioSource.playOnAwake = data.playOnAwake;
             
-            audioSource.mute = data.mute;
-            audioSource.bypassEffects = data.bypassEffects;
-            audioSource.bypassListenerEffects = data.bypassListenerEffects;
-            audioSource.bypassReverbZones = data.bypassReverbZones;
+            _audioSource.mute = data.mute;
+            _audioSource.bypassEffects = data.bypassEffects;
+            _audioSource.bypassListenerEffects = data.bypassListenerEffects;
+            _audioSource.bypassReverbZones = data.bypassReverbZones;
             
-            audioSource.priority = data.priority;
-            audioSource.volume = data.volume;
-            audioSource.pitch = data.pitch;
-            audioSource.panStereo = data.panStereo;
-            audioSource.spatialBlend = data.spatialBlend;
-            audioSource.reverbZoneMix = data.reverbZoneMix;
-            audioSource.dopplerLevel = data.dopplerLevel;
-            audioSource.spread = data.spread;
+            _audioSource.priority = data.priority;
+            _audioSource.volume = data.volume;
+            _audioSource.pitch = data.pitch;
+            _audioSource.panStereo = data.panStereo;
+            _audioSource.spatialBlend = data.spatialBlend;
+            _audioSource.reverbZoneMix = data.reverbZoneMix;
+            _audioSource.dopplerLevel = data.dopplerLevel;
+            _audioSource.spread = data.spread;
             
-            audioSource.minDistance = data.minDistance;
-            audioSource.maxDistance = data.maxDistance;
+            _audioSource.minDistance = data.minDistance;
+            _audioSource.maxDistance = data.maxDistance;
             
-            audioSource.ignoreListenerVolume = data.ignoreListenerVolume;
-            audioSource.ignoreListenerPause = data.ignoreListenerPause;
+            _audioSource.ignoreListenerVolume = data.ignoreListenerVolume;
+            _audioSource.ignoreListenerPause = data.ignoreListenerPause;
             
-            audioSource.rolloffMode = data.rolloffMode;
+            _audioSource.rolloffMode = data.rolloffMode;
         }
 
         public void Play() {
-            if (playingCoroutine != null) {
-                StopCoroutine(playingCoroutine);
+            if (_playingCoroutine != null) {
+                StopCoroutine(_playingCoroutine);
             }
             
-            audioSource.Play();
-            playingCoroutine = StartCoroutine(WaitForSoundToEnd());
+            _audioSource.Play();
+            
+            if(Data.loop == false)
+                _playingCoroutine = StartCoroutine(WaitForSoundToEnd());
         }
 
         IEnumerator WaitForSoundToEnd() {
-            yield return new WaitWhile(() => audioSource.isPlaying);
+            _waitWhilePlaying ??= new WaitWhile(() => _audioSource.isPlaying);
+            yield return _waitWhilePlaying;
             Stop();
         }
 
         public void Stop() {
-            if (playingCoroutine != null) {
-                StopCoroutine(playingCoroutine);
-                playingCoroutine = null;
+            if (_playingCoroutine != null) {
+                StopCoroutine(_playingCoroutine);
+                _playingCoroutine = null;
             }
             
-            audioSource.Stop();
+            _audioSource.Stop();
+            IsActive = false;
+            
+            OnStopped?.Invoke();
             SoundManager.Instance.ReturnToPool(this);
         }
 
         public void WithRandomPitch(float min = -0.05f, float max = 0.05f) {
-            audioSource.pitch += Random.Range(min, max);
+            _audioSource.pitch += Random.Range(min, max);
+        }
+        
+        public void SetVolume(float volume)
+        {
+            _audioSource.volume = volume;
         }
     }
 }
