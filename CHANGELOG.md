@@ -1,5 +1,9 @@
+## [1.1.1] - 2025-07-14
+## MusicManager fix
+- MusicManager: crossfade attribute in play method now overrides crossfade variable completely
+
 ## [1.1.0] - 2025-07-10
-## Adjustments
+## Small updates and more control over cached emitters in the sound builder.
 - Support for looping playlist in MusicManager
 - Option to disable crossfade in MusicManager
 - Added a cache emitter variable to the sound builder for more control over the last emitter started by the builder.
@@ -15,7 +19,7 @@
 add them in the respective managers.
 - Created sound entries and music entries scriptable to be added to the sound library and music library respectively 
 for each sound
-- Added a entry generator for both music and sound, so it's possible to create several entries at once.
-- Static class to instantiate both managers before load if it's located in the resources folder.
+- Added an entry generator for both music and sound, so it's possible to create several entries at once.
+- Static class to instantiate both managers before load if it's located in the /resources folder.
 - Manager prefabs added to prefabs folder, libraries / entries generator added to scriptable folder.
 - UI Documents (UI toolkit) for libraries and entries inspector added.

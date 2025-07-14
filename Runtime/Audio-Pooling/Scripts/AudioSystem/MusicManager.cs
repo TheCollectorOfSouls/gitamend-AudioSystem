@@ -64,14 +64,14 @@ namespace AudioSystem {
 
         public void PlayNextTrack() {
             if (_playlist.TryDequeue(out AudioClip nextTrack)) {
-                Play(nextTrack);
+                Play(nextTrack, loop: false, _crossFadeEnabled);
             }
         }
 
-        public void Play(string nameTag, bool loop = false)
+        public void Play(string nameTag, bool loop = false, bool crossFade = false)
         {
             if(!CurrentMusicLibrary) return;
-            Play(musicLibrary.GetMusicClip(nameTag), loop);
+            Play(musicLibrary.GetMusicClip(nameTag), loop, crossFade);
         }
 
         public void Play(AudioClip clip, bool loop = false, bool crossFade = false) {
@@ -87,11 +87,11 @@ namespace AudioSystem {
             _current.clip = clip;
             _current.outputAudioMixerGroup = musicMixerGroup; // Set mixer group
             _current.loop = loop; // For playlist functionality, we want tracks to play once
-            _current.volume = _crossFadeEnabled || crossFade? 0 : 1;
+            _current.volume = crossFade? 0 : 1;
             _current.bypassListenerEffects = true;
             _current.Play();
 
-            if(_crossFadeEnabled || crossFade)
+            if(crossFade)
             {
                 _fading = 0.001f;
             }
